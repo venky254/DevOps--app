@@ -1,48 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevOps Learning</title>
-    <link rel="stylesheet" href="style.css">
+    <title>DevOps AI Assistant</title>
+
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<header>
-    <h1>  DevOps Learning Project</h1>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="quotes.html">Quotes</a>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo"> DevOps AI Assistant</div>
+
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#assistant">AI Assistant</a></li>
+            <li><a href="#yaml">YAML Generator</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
     </nav>
-</header>
 
-<div class="container">
-    <h2>Welcome to DevOps</h2>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <h1>Welcome to DevOps AI Assistant</h1>
 
-    <p>
-        This project demonstrates a complete DevOps workflow using
-        Git, GitHub, Docker, GitHub Actions,Kubernetes Grafana and AWS EC2.
-    </p>
+        <p>
+            Learn Kubernetes, Docker, AWS, Terraform,
+            GitHub Actions and DevOps using AI.
+        </p>
 
-    <h3>Technologies Used</h3>
+        <a href="#assistant" class="btn">
+            Start Learning
+        </a>
+    </section>
 
-    <ul>
-        <li>Git & GitHub</li>
-        <li>Docker</li>
-        <li>GitHub Actions</li>
-        <li>AWS EC2</li>
-        <li>Node.js</li>
-        <li>HTML & CSS</li>
-    </ul>
+    <!-- AI Assistant -->
+    <section id="assistant" class="container">
 
-    <a href="quotes.html" class="btn">
-        Read DevOps Quotes
-    </a>
-</div>
+        <h2>🤖 AI Assistant</h2>
 
-<footer>
-    <p>Created by Venkataramana | DevOps Learning Project</p>
-</footer>
+        <textarea
+            id="question"
+            placeholder="Ask any DevOps question..."
+            rows="6"></textarea>
+
+        <br><br>
+
+        <button id="askBtn">
+            Ask AI
+        </button>
+
+        <div id="response">
+            AI response will appear here...
+        </div>
+
+    </section>
+
+    <!-- YAML Generator -->
+    <section id="yaml" class="container">
+
+        <h2>📄 YAML Generator</h2>
+
+        <input
+            id="yamlPrompt"
+            type="text"
+            placeholder="Example: Create Deployment YAML for nginx">
+
+        <br><br>
+
+        <button id="generateBtn">
+            Generate YAML
+        </button>
+
+        <pre id="yamlOutput">
+Generated YAML will appear here...
+        </pre>
+
+    </section>
+
+    <!-- About -->
+    <section id="about" class="container">
+
+        <h2>About Project</h2>
+
+        <p>
+            DevOps AI Assistant is an AI-powered application for learning
+            DevOps technologies and generating Kubernetes YAML files.
+        </p>
+
+        <h3>Technologies Used</h3>
+
+        <ul>
+            <li>Docker</li>
+            <li>Kubernetes</li>
+            <li>AWS</li>
+            <li>Terraform</li>
+            <li>GitHub Actions</li>
+            <li>Node.js</li>
+            <li>Express.js</li>
+            <li>OpenAI API</li>
+        </ul>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <h3> DevOps AI Assistant</h3>
+        <p>Built with ❤️ using Node.js, Express, Docker, Kubernetes & OpenAI</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/assistant.js"></script>
 
 </body>
+
 </html>
