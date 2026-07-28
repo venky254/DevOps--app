@@ -44,5 +44,5 @@ jobs:
 
             docker run -d \
               --name devops-backend \
-              -p 3000:3000 \
+              -p 5000:5000 \
               ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
