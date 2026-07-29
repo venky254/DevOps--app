@@ -56,14 +56,16 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest ./backend
 
-      # Scan Docker Image using Trivy
+      # Trivy Security Scan
       - name: Trivy Security Scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
-          format: table
-          exit-code: '1'
-          severity: HIGH,CRITICAL
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --format table \
+            --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
 
       # Push Docker Image
       - name: Push Docker Image
