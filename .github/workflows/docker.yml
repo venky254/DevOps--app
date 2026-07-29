@@ -94,4 +94,37 @@ jobs:
               --restart unless-stopped \
               -p 5000:5000 \
               ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
+            # Slack Notification
+      - name: Slack Notification
+        if: always()
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: " GitHub Actions Pipeline Notification"
+            attachments:
+              - color: "${{ job.status == 'success' && 'good' || 'danger' }}"
+                fields:
+                  - title: Repository
+                    value: "${{ github.repository }}"
+                    short: true
+                  - title: Workflow
+                    value: "${{ github.workflow }}"
+                    short: true
+                  - title: Branch
+                    value: "${{ github.ref_name }}"
+                    short: true
+                  - title: Status
+                    value: "${{ job.status }}"
+                    short: true
+                  - title: Commit
+                    value: "${{ github.sha }}"
+                    short: false
+                  - title: Triggered By
+                    value: "${{ github.actor }}"
+                    short: true
+                  - title: Run
+                    value: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    short: false   
               
