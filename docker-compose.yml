@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mongodb:
     image: mongo:7
@@ -11,7 +9,7 @@ services:
       - mongo-data:/data/db
 
   backend:
-    image: YOUR_DOCKER_USERNAME/devops-backend:latest
+    image: venaktramana773/devops-backend:latest
     container_name: backend
     restart: always
     ports:
@@ -22,7 +20,7 @@ services:
       MONGO_URI: mongodb://mongodb:27017/helloapp
 
   frontend:
-    image: YOUR_DOCKER_USERNAME/devops-frontend:latest
+    image: venaktramana773/devops-frontend:latest
     container_name: frontend
     restart: always
     ports:
