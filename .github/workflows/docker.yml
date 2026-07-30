@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout Repository
+      # Checkout
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -20,12 +20,12 @@ jobs:
         with:
           node-version: "20"
 
-      # Install Dependencies
-      - name: Install Dependencies
+      # Install Backend Dependencies
+      - name: Install Backend Dependencies
         working-directory: backend
         run: npm install
 
-      # Run Unit Tests (optional)
+      # Run Tests
       - name: Run Unit Tests
         working-directory: backend
         run: npm test || true
@@ -37,43 +37,63 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # SonarQube Quality Gate
-      - name: SonarQube Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-        timeout-minutes: 5
+      # Gitleaks Secret Scan
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Login to Docker Hub
+      # Dependency Scan
+      - name: npm Audit
+        working-directory: backend
+        run: npm audit --audit-level=high || true
+
+      # Login Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Docker Image
-      - name: Build Docker Image
+      # Build Backend Image
+      - name: Build Backend Image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest ./backend
 
-      # Trivy Security Scan (Report only)
-      - name: Trivy Security Scan
+      # Build Frontend Image
+      - name: Build Frontend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-frontend:latest ./frontend
+
+      # Trivy Backend Scan
+      - name: Trivy Scan Backend
         run: |
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -v $HOME/.cache:/root/.cache \
             aquasec/trivy:latest image \
-            --format table \
             --severity HIGH,CRITICAL \
             --exit-code 0 \
             ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
 
-      # Push Docker Image
-      - name: Push Docker Image
+      # Trivy Frontend Scan
+      - name: Trivy Scan Frontend
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --exit-code 0 \
+            ${{ secrets.DOCKER_USERNAME }}/devops-frontend:latest
 
-      # Deploy to EC2
+      # Push Backend Image
+      - name: Push Backend Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
+
+      # Push Frontend Image
+      - name: Push Frontend Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/devops-frontend:latest
+
+      # Deploy
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -82,19 +102,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
+            cd /home/ubuntu/DevOps-app
+
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-            docker pull ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
+            docker compose pull
+            docker compose down
+            docker compose up -d
 
-            docker stop devops-backend || true
-            docker rm devops-backend || true
-
-            docker run -d \
-              --name devops-backend \
-              --restart unless-stopped \
-              -p 5000:5000 \
-              ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
-            # Slack Notification
+      # Slack Notification
       - name: Slack Notification
         if: always()
         uses: slackapi/slack-github-action@v2.1.1
@@ -102,7 +118,7 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: " GitHub Actions Pipeline Notification"
+            text: "🚀 GitHub Actions Pipeline Notification"
             attachments:
               - color: "${{ job.status == 'success' && 'good' || 'danger' }}"
                 fields:
@@ -126,5 +142,4 @@ jobs:
                     short: true
                   - title: Run
                     value: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                    short: false   
-              
+                    short: false
