@@ -9,7 +9,7 @@ services:
       - mongo-data:/data/db
 
   backend:
-    image: venaktramana773/devops-backend:latest
+    image: venkataramana773/devops-backend:latest
     container_name: backend
     restart: always
     ports:
@@ -20,7 +20,7 @@ services:
       MONGO_URI: mongodb://mongodb:27017/helloapp
 
   frontend:
-    image: venaktramana773/devops-frontend:latest
+    image: venkataramana773/devops-frontend:latest
     container_name: frontend
     restart: always
     ports:
