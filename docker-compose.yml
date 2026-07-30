@@ -11,7 +11,7 @@ services:
       - mongo-data:/data/db
 
   backend:
-    build: ./backend
+    image: YOUR_DOCKER_USERNAME/devops-backend:latest
     container_name: backend
     restart: always
     ports:
@@ -22,7 +22,7 @@ services:
       MONGO_URI: mongodb://mongodb:27017/helloapp
 
   frontend:
-    build: ./frontend
+    image: YOUR_DOCKER_USERNAME/devops-frontend:latest
     container_name: frontend
     restart: always
     ports:
