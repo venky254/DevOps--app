@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout
+      # Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -25,7 +25,7 @@ jobs:
         working-directory: backend
         run: npm install
 
-      # Run Tests
+      # Run Unit Tests
       - name: Run Unit Tests
         working-directory: backend
         run: npm test || true
@@ -48,7 +48,7 @@ jobs:
         working-directory: backend
         run: npm audit --audit-level=high || true
 
-      # Login Docker Hub
+      # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -65,7 +65,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-frontend:latest ./frontend
 
-      # Trivy Backend Scan
+      # Trivy Scan Backend
       - name: Trivy Scan Backend
         run: |
           docker run --rm \
@@ -75,7 +75,7 @@ jobs:
             --exit-code 0 \
             ${{ secrets.DOCKER_USERNAME }}/devops-backend:latest
 
-      # Trivy Frontend Scan
+      # Trivy Scan Frontend
       - name: Trivy Scan Frontend
         run: |
           docker run --rm \
@@ -93,7 +93,7 @@ jobs:
       - name: Push Frontend Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/devops-frontend:latest
 
-      # Deploy
+      # Deploy to EC2
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -102,13 +102,17 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            cd /home/ubuntu/DevOps-app
+            cd /home/ubuntu/DevOps--app
 
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
 
             docker compose pull
-            docker compose down
+
+            docker compose down || true
+
             docker compose up -d
+
+            docker image prune -f
 
       # Slack Notification
       - name: Slack Notification
